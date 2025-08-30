@@ -6,61 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>E-Commerce | Home</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <style>
-    .gradient-bg {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .hero-pattern {
-      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-    }
-
-    .product-card {
-      transition: all 0.3s ease;
-      transform: translateY(0);
-    }
-
-    .product-card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    }
-
-    .featured-product {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    }
-
-    .animate-fade-in {
-      animation: fadeIn 0.6s ease-in-out;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .loading-shimmer {
-      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-    }
-
-    @keyframes shimmer {
-      0% {
-        background-position: -200% 0;
-      }
-
-      100% {
-        background-position: 200% 0;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="./styles/style.css">
 </head>
 
 <body class="flex flex-col min-h-screen bg-gray-50">
@@ -69,7 +15,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center py-4">
         <div class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-          MyShop
+          StanP Collections
         </div>
         <nav class="hidden md:flex space-x-8">
           <a href="index.html" class="text-gray-900 hover:text-purple-600 font-medium transition duration-200">Home</a>
@@ -256,7 +202,7 @@
         <div>
           <h4
             class="text-2xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
-            MyShop</h4>
+            StanP Collections</h4>
           <p class="text-gray-300">Your trusted online shopping destination</p>
         </div>
         <div>
@@ -285,253 +231,13 @@
         </div>
       </div>
       <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
-        <p>&copy; 2025 MyShop. All rights reserved.</p>
+        <p>&copy; 2025 StanP Collections. All rights reserved.</p>
       </div>
     </div>
   </footer>
 
-  <script>
-    const API_URL = "https://fakestoreapi.com/products";
+  <script src="./scripts/script.js">
 
-    const CATEGORIES_URL = "https://fakestoreapi.com/products/categories";
-
-    // Category configurations with icons and descriptions
-    const categoryConfig = {
-      'electronics': {
-        icon: '📱',
-        description: 'Latest gadgets and tech products',
-        gradient: 'electronics-gradient'
-      },
-      'jewelery': {
-        icon: '💎',
-        description: 'Beautiful jewelry and accessories',
-        gradient: 'jewelery-gradient'
-      },
-      "men's clothing": {
-        icon: '👔',
-        description: 'Stylish clothing for men',
-        gradient: 'mens-gradient'
-      },
-      "women's clothing": {
-        icon: '👗',
-        description: 'Fashion-forward women\'s wear',
-        gradient: 'womens-gradient'
-      }
-    };
-
-    // Fetch and display products
-    if (document.getElementById("product-list")) {
-      fetch(API_URL)
-        .then(res => res.json())
-        .then(products => {
-          const randomIndex = Math.floor(Math.random() * products.length);
-          displayFeaturedProduct(products[randomIndex]);
-          displayProducts(products.slice(1, 5)); // Show next 8 products in grid
-        })
-        .catch(error => {
-          console.error('Error fetching products:', error);
-          document.getElementById("product-list").innerHTML = '<p class="text-center text-gray-500 col-span-full">Failed to load products. Please try again later.</p>';
-        });
-    }
-    
-    // Fetch and display categories
-    if (document.getElementById("categories-list")) {
-      Promise.all([
-        fetch(CATEGORIES_URL).then(res => res.json()),
-        fetch(API_URL).then(res => res.json())
-      ])
-      .then(([categories, products]) => {
-        displayCategories(categories, products);
-      })
-      .catch(error => {
-        console.error('Error fetching categories:', error);
-        document.getElementById("categories-list").innerHTML = '<p class="text-center text-gray-500 col-span-full">Failed to load categories. Please try again later.</p>';
-      });
-    }
-
-    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-
-    function updateCartCount() {
-      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-      const cartCount = document.getElementById('cart-count');
-      cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
-    }
-    updateCartCount();
-
-    function displayFeaturedProduct(product) {
-      const featuredContainer = document.getElementById("featured-product");
-      featuredContainer.innerHTML = `
-        <img src="${product.image}" alt="${product.title}" class="w-full h-64 object-contain mb-6 rounded-2xl">
-        <div class="space-y-4">
-          <h3 class="text-2xl font-bold text-gray-900 line-clamp-2">${product.title}</h3>
-          <p class="text-gray-600 text-sm line-clamp-3">${product.description}</p>
-          <div class="flex items-center justify-between">
-            <span class="text-3xl font-bold text-purple-600">$${product.price}</span>
-            <div class="flex items-center space-x-1">
-              <span class="text-yellow-400">★</span>
-              <span class="font-medium">${product.rating?.rate || 'N/A'}</span>
-              <span class="text-gray-500">(${product.rating?.count || 0})</span>
-            </div>
-          </div>
-          <div class="flex space-x-3">
-            <a href="./pages/product.html?id=${product.id}" 
-               class="flex-1 bg-purple-600 text-white text-center py-3 px-6 rounded-full hover:bg-purple-700 transition duration-300 font-medium">
-              View Details
-            </a>
-            <button 
-              class="bg-gray-100 text-gray-800 py-3 px-6 rounded-full hover:bg-gray-200 transition duration-300 font-medium add-to-cart-btn"
-              data-id="${product.id}" data-title="${product.title}" data-price="${product.price}" data-image="${product.image}">
-              Add to Cart
-            </button>
-          </div>
-        </div>
-      `;
-    }
-
-    function displayProducts(products) {
-      const container = document.getElementById("product-list");
-      container.innerHTML = products.map(product => `
-        <div class="product-card bg-white rounded-2xl shadow-lg overflow-hidden animate-fade-in">
-          <div class="relative">
-            <img src="${product.image}" alt="${product.title}" class="w-full h-48 object-contain p-4">
-          </div>
-          <div class="p-6">
-            <h3 class="font-bold text-lg mb-2 text-gray-900 line-clamp-2">${product.title}</h3>
-            <div class="flex items-center justify-between mb-4">
-              <span class="text-2xl font-bold text-purple-600">$${product.price}</span>
-              <div class="flex items-center space-x-1">
-                <span class="text-yellow-400 text-sm">★</span>
-                <span class="text-sm text-gray-600">${product.rating?.rate || 'N/A'}</span>
-              </div>
-            </div>
-            <div class="space-y-2">
-              <a href="./pages/product.html?id=${product.id}" 
-                 class="block w-full bg-purple-600 text-white text-center py-2 px-4 rounded-full hover:bg-purple-700 transition duration-300 font-medium">
-                View Details
-              </a>
-              <button 
-                class="w-full bg-gray-100 text-gray-800 py-2 px-4 rounded-full hover:bg-gray-200 transition duration-300 font-medium add-to-cart-btn"
-                data-id="${product.id}" data-title="${product.title}" data-price="${product.price}" data-image="${product.image}">
-                Add to Cart
-              </button>
-            </div>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function displayCategories(categories, products) {
-      const container = document.getElementById("categories-list");
-      
-      // Count products in each category
-      const categoryCounts = {};
-      categories.forEach(cat => {
-        categoryCounts[cat] = products.filter(product => product.category === cat).length;
-      });
-
-      // Get a sample product image for each category
-      const categoryImages = {};
-      categories.forEach(cat => {
-        const categoryProduct = products.find(product => product.category === cat);
-        categoryImages[cat] = categoryProduct ? categoryProduct.image : 'https://via.placeholder.com/300x300?text=No+Image';
-      });
-
-      container.innerHTML = categories.map(category => {
-        const config = categoryConfig[category] || { 
-          icon: '🛍️', 
-          description: 'Browse our collection',
-          gradient: 'electronics-gradient'
-        };
-        
-        return `
-          <div class="category-card bg-white rounded-3xl shadow-lg overflow-hidden animate-fade-in">
-            <div class="relative ${config.gradient} p-8 h-48 flex items-center justify-center">
-              <div class="text-center text-white">
-                <div class="text-6xl mb-4">${config.icon}</div>
-                <div class="absolute inset-0 bg-black bg-opacity-20 rounded-t-3xl"></div>
-                <img src="${categoryImages[category]}" alt="${category}" class="absolute inset-4 w-auto h-auto object-contain opacity-20 rounded-2xl">
-              </div>
-            </div>
-            <div class="p-6">
-              <h3 class="font-bold text-xl mb-2 text-gray-900 capitalize">${category}</h3>
-              <p class="text-gray-600 text-sm mb-4">${config.description}</p>
-              <div class="flex items-center justify-between mb-4">
-                <span class="text-sm text-gray-500">${categoryCounts[category]} products</span>
-                <div class="flex items-center space-x-1">
-                  <span class="text-yellow-400 text-sm">★★★★★</span>
-                </div>
-              </div>
-              <a href="./pages/category.html?category=${encodeURIComponent(category)}" 
-                 class="block w-full bg-gray-900 text-white text-center py-3 px-6 rounded-full hover:bg-gray-800 transition duration-300 font-medium transform hover:scale-105">
-                Explore ${category}
-              </a>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function addToCart(id, title, price, image) {
-      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-      const existingItem = cart.find(item => item.id === id);
-      if (existingItem) {
-        existingItem.quantity += 1;
-      } else {
-        cart.push({ id, title, price, image, quantity: 1 });
-      }
-      localStorage.setItem('cart', JSON.stringify(cart));
-      updateCartCount();
-      showToast(`${title} added to cart!`);
-    }
-
-    function showToast(message) {
-      let toast = document.getElementById('cart-toast');
-      if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'cart-toast';
-        toast.style.position = 'fixed';
-        toast.style.bottom = '30px';
-        toast.style.right = '30px';
-        toast.style.zIndex = '9999';
-        toast.style.background = '#10b981';
-        toast.style.color = '#fff';
-        toast.style.padding = '16px 24px';
-        toast.style.borderRadius = '8px';
-        toast.style.fontSize = '16px';
-        toast.style.boxShadow = '0 4px 24px rgba(0,0,0,0.15)';
-        document.body.appendChild(toast);
-      }
-      toast.textContent = message;
-      toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 2000);
-    }
-
-    // Delegate click event after products are rendered
-    document.addEventListener('click', function(e) {
-      if (e.target.classList.contains('add-to-cart-btn')) {
-        const btn = e.target;
-        addToCart(
-          parseInt(btn.getAttribute('data-id')),
-          btn.getAttribute('data-title'),
-          parseFloat(btn.getAttribute('data-price')),
-          btn.getAttribute('data-image')
-        );
-      }
-    });
-
-    // Add smooth scrolling for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-          target.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-          });
-        }
-      });
-    });
   </script>
 </body>
 

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shopping Cart - MyShop</title>
+  <title>Shopping Cart - StanP Collections</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -40,7 +40,7 @@
             <i class="fas fa-shopping-bag text-white text-sm"></i>
           </div>
           <div class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            MyShop
+           StanP Collections
           </div>
         </div>
         <nav class="flex items-center space-x-6">
@@ -157,140 +157,6 @@
     </div>
   </div>
 
-  <script>
-
-    let cartData = JSON.parse(localStorage.getItem('cart') || '[]');
-
-    function showToast(message) {
-      const toast = document.getElementById('toast');
-      const toastMessage = document.getElementById('toast-message');
-      toastMessage.textContent = message;
-      toast.classList.remove('translate-y-full');
-      setTimeout(() => {
-        toast.classList.add('translate-y-full');
-      }, 3000);
-    }
-
-    function updateQuantity(id, change) {
-      const item = cartData.find(item => item.id === id);
-      if (item) {
-        item.quantity += change;
-        if (item.quantity <= 0) {
-          cartData = cartData.filter(item => item.id !== id);
-          showToast('Item removed from cart');
-        } else {
-          showToast('Quantity updated');
-        }
-        localStorage.setItem('cart', JSON.stringify(cartData)); // <-- Save changes!
-        renderCart();
-        updateCartCount();
-      }
-    }
-
-    function removeItem(id) {
-      cartData = cartData.filter(item => item.id !== id);
-      localStorage.setItem('cart', JSON.stringify(cartData)); // <-- Save changes!
-      showToast('Item removed from cart');
-      renderCart();
-      updateCartCount();
-    }
-
-    function clearCart() {
-      if (confirm('Are you sure you want to clear your cart?')) {
-        cartData = [];
-        showToast('Cart cleared');
-        localStorage.setItem('cart', JSON.stringify(cartData));
-        renderCart();
-        updateCartCount();
-      }
-    }
-
-    function updateCartCount() {
-      const totalItems = cartData.reduce((sum, item) => sum + item.quantity, 0);
-      document.getElementById('cart-count').textContent = totalItems;
-    }
-
-    function renderCart() {
-      const container = document.getElementById('cart-items');
-      const emptyState = document.getElementById('empty-cart');
-      
-      if (cartData.length === 0) {
-        container.innerHTML = '';
-        emptyState.classList.remove('hidden');
-        document.getElementById('subtotal').textContent = '$0.00';
-        document.getElementById('tax').textContent = '$0.00';
-        document.getElementById('cart-total').textContent = '$0.00';
-        return;
-      }
-      
-      emptyState.classList.add('hidden');
-      let total = 0;
-      
-      container.innerHTML = cartData.map((item, index) => {
-        const itemTotal = item.price * item.quantity;
-        total += itemTotal;
-        
-        return `
-          <div class="p-6 hover:bg-slate-50 transition-colors duration-200 animate-fade-in" style="animation-delay: ${index * 0.1}s">
-            <div class="flex items-center space-x-4">
-              <div class="relative">
-                <img src="${item.image}" alt="${item.title}" class="w-20 h-20 object-cover rounded-xl shadow-md">
-                <div class="absolute -top-2 -right-2 bg-blue-600 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
-                  ${item.quantity}
-                </div>
-              </div>
-              
-              <div class="flex-1 min-w-0">
-                <h3 class="font-semibold text-slate-800 truncate">${item.title}</h3>
-                <p class="text-slate-600 text-sm mt-1">$${item.price.toFixed(2)} each</p>
-                <p class="text-blue-600 font-semibold mt-2">$${itemTotal.toFixed(2)}</p>
-              </div>
-              
-              <div class="flex items-center space-x-3">
-                <div class="flex items-center bg-slate-100 rounded-lg">
-                  <button onclick="updateQuantity(${item.id}, -1)" class="w-8 h-8 flex items-center justify-center text-slate-600 hover:text-red-600 transition-colors duration-200">
-                    <i class="fas fa-minus text-xs"></i>
-                  </button>
-                  <span class="w-8 h-8 flex items-center justify-center font-semibold text-slate-800">${item.quantity}</span>
-                  <button onclick="updateQuantity(${item.id}, 1)" class="w-8 h-8 flex items-center justify-center text-slate-600 hover:text-green-600 transition-colors duration-200">
-                    <i class="fas fa-plus text-xs"></i>
-                  </button>
-                </div>
-                
-                <button onclick="removeItem(${item.id})" class="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-red-600 transition-colors duration-200 rounded-lg hover:bg-red-50">
-                  <i class="fas fa-trash text-sm"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        `;
-      }).join('');
-      
-      const tax = total * 0.08; // 8% tax
-      const finalTotal = total + tax;
-      
-      document.getElementById('subtotal').textContent = `$${total.toFixed(2)}`;
-      document.getElementById('tax').textContent = `$${tax.toFixed(2)}`;
-      document.getElementById('cart-total').textContent = `$${finalTotal.toFixed(2)}`;
-    }
-
-    // Event listeners
-    document.getElementById('clear-cart').addEventListener('click', clearCart);
-    document.getElementById('checkout-btn').addEventListener('click', () => {
-      if (cartData.length === 0) {
-        alert('Your cart is empty!');
-        return;
-      }
-      showToast('Redirecting to checkout...');
-      setTimeout(() => {
-        window.location.href = 'checkout.html';
-      }, 1000);
-    });
-
-    // Initialize cart
-    renderCart();
-    updateCartCount();
-
-  </script>
+  <script src="../scripts/script.js"></script>
 </body>
 </html>

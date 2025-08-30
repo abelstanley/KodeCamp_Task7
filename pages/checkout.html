@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checkout - MyShop</title>
+  <title>Checkout - StanP Collections </title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
     * {
@@ -316,7 +316,7 @@
   <div class="container">
     <header class="header">
       <div class="logo">
-        <i class="fas fa-shopping-bag"></i> MyShop
+        <i class="fas fa-shopping-bag"></i> StanP Collections
       </div>
       <div class="security-badge">
         <i class="fas fa-shield-alt"></i>
@@ -462,118 +462,6 @@
     <button id="go-home-btn" style="margin-left:24px;background:#fff;color:#10b981;font-weight:600;padding:8px 18px;border:none;border-radius:8px;cursor:pointer;">Go to Home</button>
   </div>
 
-  <script>
-    // Function to get cart from localStorage
-    function getCart() {
-      return JSON.parse(localStorage.getItem("cart") || "[]");
-    }
-
-    // Load order summary
-    function loadOrderSummary() {
-      const cart = getCart();
-      const orderItemsEl = document.getElementById('order-items');
-      const subtotalEl = document.getElementById('subtotal');
-      const taxEl = document.getElementById('tax');
-      const totalEl = document.getElementById('total');
-      
-      let subtotal = 0;
-      let itemsHtml = '';
-
-      cart.forEach(item => {
-        const qty = parseInt(item.quantity) || 0;
-        const price = parseFloat(item.price) || 0;
-        const itemTotal = price * qty;
-        subtotal += itemTotal;
-
-        itemsHtml += `
-          <div class="order-item">
-            <div class="item-details">
-              <div class="item-name">${item.title}</div>
-              <div class="item-qty">Qty: ${qty}</div>
-            </div>
-            <div class="item-price">$${itemTotal.toFixed(2)}</div>
-          </div>
-        `;
-      });
-
-      const shipping = subtotal > 100 ? 0 : 9.99;
-      const tax = subtotal * 0.08; // 8% tax rate
-      const total = subtotal + shipping + tax;
-
-      orderItemsEl.innerHTML = itemsHtml;
-      subtotalEl.textContent = `$${subtotal.toFixed(2)}`;
-      document.getElementById('shipping').textContent = shipping === 0 ? 'Free' : `$${shipping.toFixed(2)}`;
-      taxEl.textContent = `$${tax.toFixed(2)}`;
-      totalEl.textContent = `$${total.toFixed(2)}`;
-    }
-
-    // Format card number input
-    document.getElementById('cardNumber').addEventListener('input', function(e) {
-      let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-      let formattedValue = value.match(/.{1,4}/g)?.join(' ') ?? value;
-      e.target.value = formattedValue;
-    });
-
-    // Format expiry date input
-    document.getElementById('expiry').addEventListener('input', function(e) {
-      let value = e.target.value.replace(/\D/g, '');
-      if (value.length >= 2) {
-        value = value.substring(0,2) + '/' + value.substring(2,4);
-      }
-      e.target.value = value;
-    });
-
-    // CVV input validation
-    document.getElementById('cvv').addEventListener('input', function(e) {
-      e.target.value = e.target.value.replace(/\D/g, '');
-    });
-
-    // Form submission
-    document.getElementById('checkout-form').addEventListener('submit', function(e) {
-      e.preventDefault();
-
-      const button = document.querySelector('.place-order-btn');
-      const buttonText = button.querySelector('span');
-      const buttonIcon = button.querySelector('i');
-      let redirected = false; // Flag to track if user clicked the button
-
-      // Show loading state
-      button.classList.add('loading');
-      buttonIcon.className = 'fas fa-spinner spinner';
-      buttonText.textContent = 'Processing Order...';
-
-      // Simulate order processing
-      setTimeout(() => {
-        // Show order success toast
-        const toast = document.getElementById('order-toast');
-        toast.style.display = 'flex';
-
-        // Clear the cart after successful checkout
-        localStorage.setItem('cart', '[]');
-
-        // Button click handler
-        document.getElementById('go-home-btn').onclick = function() {
-          redirected = true;
-          window.location.href = '../index.html';
-        };
-
-        setTimeout(() => {
-          toast.style.opacity = 0;
-          setTimeout(() => { 
-            toast.style.display = 'none'; 
-            if (!redirected) {
-              window.location.href = '../index.html';
-            }
-          }, 300);
-        }, 2000);
-
-        button.classList.remove('loading');
-        buttonIcon.className = 'fas fa-lock';
-        buttonText.textContent = 'Place Secure Order';
-      }, 2000);
-    });
-    // Load order summary on page load
-    document.addEventListener('DOMContentLoaded', loadOrderSummary);
-  </script>
+  <script src="../scripts/script.js"></script>
 </body>
 </html>

@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Product Details - MyShop</title>
+  <title>Product Details - StanP Collections</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
   <style>
     .gradient-bg {
@@ -95,7 +95,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between items-center py-4">
         <div class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-          MyShop
+          StanP Collections
         </div>
         <nav class="hidden md:flex space-x-8">
           <a href="../index.html" class="text-gray-900 hover:text-purple-600 font-medium transition duration-200">Home</a>
@@ -206,10 +206,7 @@
                 class="add-to-cart-btn text-white px-8 py-4 rounded-lg font-bold text-lg flex-1 hover:scale-105">
                 Add to Cart
               </button>
-              <button
-                class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-50 transition-colors">
-                ❤️ Add to Wishlist
-              </button>
+              
             </div>
 
             <!-- Additional Info -->
@@ -270,7 +267,7 @@
   </main>
 
   <script>
-    // Mock API URL - replace with your actual API
+
     const API_URL = "https://fakestoreapi.com/products";
 
     // Cart functionality
@@ -347,7 +344,7 @@
           document.getElementById('product-details').classList.remove('hidden');
 
           // Update page title and breadcrumb
-          document.title = `${product.title} - MyShop`;
+          document.title = `${product.title} - StanP Collections`;
           document.getElementById('breadcrumb-product').textContent = product.title;
 
           // Populate product details
