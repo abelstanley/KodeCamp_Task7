@@ -554,7 +554,7 @@
         // Button click handler
         document.getElementById('go-home-btn').onclick = function() {
           redirected = true;
-          window.location.href = 'index.html';
+          window.location.href = '../index.html';
         };
 
         setTimeout(() => {
@@ -562,7 +562,7 @@
           setTimeout(() => { 
             toast.style.display = 'none'; 
             if (!redirected) {
-              window.location.href = 'index.html';
+              window.location.href = '../index.html';
             }
           }, 300);
         }, 2000);
