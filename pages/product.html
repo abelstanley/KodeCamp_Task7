@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Details - MyShop</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .product-image {
+      transition: transform 0.3s ease;
+    }
+
+    .product-image:hover {
+      transform: scale(1.05);
+    }
+
+    .rating-stars {
+      color: #fbbf24;
+    }
+
+    .quantity-btn {
+      transition: all 0.2s ease;
+    }
+
+    .quantity-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .add-to-cart-btn {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      transition: all 0.3s ease;
+    }
+
+    .add-to-cart-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+    }
+
+    .category-badge {
+      background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    }
+
+    .loading-spinner {
+      border: 4px solid #f3f4f6;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.6s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .price-highlight {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+  <!-- Header -->
+  <header class="bg-white shadow-lg sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4">
+        <div class="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          MyShop
+        </div>
+        <nav class="hidden md:flex space-x-8">
+          <a href="index.html" class="text-gray-900 hover:text-purple-600 font-medium transition duration-200">Home</a>
+          <a href="#shop" class="text-gray-700 hover:text-purple-600 font-medium transition duration-200">Shop</a>
+          <a href="#about" class="text-gray-700 hover:text-purple-600 font-medium transition duration-200">About</a>
+          <a href="#contact" class="text-gray-700 hover:text-purple-600 font-medium transition duration-200">Contact</a>
+        </nav>
+        <div class="flex items-center space-x-4">
+          <div class="relative">
+            <input type="text" placeholder="Search products..."
+              class="border-2 border-gray-200 rounded-full py-2 px-4 pr-10 focus:outline-none focus:border-purple-500 transition duration-200">
+            <svg class="w-5 h-5 text-gray-400 absolute right-3 top-2.5" fill="none" stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <a href="cart.html"
+            class="relative bg-purple-600 text-white p-2 rounded-full hover:bg-purple-700 transition duration-200">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M3 3h2l.4 2M7 13h10l4-8H5.4m1.6 8L5 3H3m4 10v6a1 1 0 001 1h10a1 1 0 001-1v-6M9 19a2 2 0 11-4 0 2 2 0 014 0zm8 0a2 2 0 11-4 0 2 2 0 014 0z">
+              </path>
+            </svg>
+            <span id="cart-count"
+              class="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full min-w-[20px] text-center">0</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 py-8">
+    <!-- Breadcrumb -->
+    <nav class="mb-8">
+      <ol class="flex items-center space-x-2 text-gray-500">
+        <li><a href="index.html" class="hover:text-purple-600 transition-colors">Home</a></li>
+        <li>→</li>
+        <!-- <li><a href="#" class="hover:text-purple-600 transition-colors">Products</a></li> -->
+        <!-- <li>→</li> -->
+        <li class="text-gray-700 font-medium" id="breadcrumb-product">Product</li>
+      </ol>
+    </nav>
+
+    <!-- Loading State -->
+    <div id="loading" class="flex justify-center items-center h-64">
+      <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Product Details -->
+    <div id="product-details" class="hidden fade-in">
+      <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div class="grid lg:grid-cols-2 gap-0">
+          <!-- Product Images -->
+          <div class="bg-gray-50 p-8 flex items-center justify-center">
+            <div class="max-w-md w-full">
+              <img id="main-image" src="" alt="" class="product-image w-full h-96 object-contain rounded-lg">
+              <!-- Image thumbnails would go here in a real implementation -->
+              <div class="flex mt-4 space-x-2 justify-center">
+                <div
+                  class="w-16 h-16 bg-white rounded-lg border-2 border-purple-200 flex items-center justify-center cursor-pointer">
+                  <span class="text-xs text-gray-500">1/1</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Product Info -->
+          <div class="p-8 lg:p-12 flex flex-col justify-center">
+            <div class="mb-4">
+              <span id="category" class="category-badge text-white px-3 py-1 rounded-full text-sm font-medium"></span>
+            </div>
+
+            <h1 id="product-title" class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight"></h1>
+
+            <!-- Rating -->
+            <div class="flex items-center mb-6">
+              <div class="flex items-center rating-stars" id="rating-stars"></div>
+              <span id="rating-text" class="ml-2 text-gray-600"></span>
+              <span id="rating-count" class="ml-2 text-gray-500"></span>
+            </div>
+
+            <!-- Price -->
+            <div class="mb-6">
+              <span id="product-price" class="text-4xl font-bold price-highlight"></span>
+              <span class="text-gray-500 ml-2">Free shipping</span>
+            </div>
+
+            <!-- Description -->
+            <p id="product-description" class="text-gray-700 mb-8 text-lg leading-relaxed"></p>
+
+            <!-- Quantity Selector -->
+            <div class="flex items-center mb-8">
+              <label class="text-gray-700 font-medium mr-4">Quantity:</label>
+              <div class="flex items-center border-2 border-gray-200 rounded-lg">
+                <button onclick="changeQuantity(-1)"
+                  class="quantity-btn px-4 py-2 text-gray-600 hover:bg-gray-100">−</button>
+                <input type="number" id="quantity" value="1" min="1" max="10"
+                  class="w-16 text-center border-none focus:outline-none py-2">
+                <button onclick="changeQuantity(1)"
+                  class="quantity-btn px-4 py-2 text-gray-600 hover:bg-gray-100">+</button>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 mb-8">
+              <button id="add-to-cart"
+                class="add-to-cart-btn text-white px-8 py-4 rounded-lg font-bold text-lg flex-1 hover:scale-105">
+                Add to Cart
+              </button>
+              <button
+                class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-50 transition-colors">
+                ❤️ Add to Wishlist
+              </button>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="grid grid-cols-2 gap-4 text-sm text-gray-600">
+              <div class="flex items-center">
+                <span class="mr-2">🚚</span>
+                <span>Free delivery</span>
+              </div>
+              <div class="flex items-center">
+                <span class="mr-2">↩️</span>
+                <span>30-day returns</span>
+              </div>
+              <div class="flex items-center">
+                <span class="mr-2">🔒</span>
+                <span>Secure payment</span>
+              </div>
+              <div class="flex items-center">
+                <span class="mr-2">⭐</span>
+                <span>Quality guarantee</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Features Section -->
+      <div class="mt-12 bg-white rounded-2xl shadow-xl p-8">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Product Features</h2>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="text-center p-4">
+            <div class="text-4xl mb-3">💎</div>
+            <h3 class="font-bold text-gray-900 mb-2">Premium Quality</h3>
+            <p class="text-gray-600">Made with the finest materials for lasting durability</p>
+          </div>
+          <div class="text-center p-4">
+            <div class="text-4xl mb-3">🚀</div>
+            <h3 class="font-bold text-gray-900 mb-2">Fast Shipping</h3>
+            <p class="text-gray-600">Get your order delivered within 2-3 business days</p>
+          </div>
+          <div class="text-center p-4">
+            <div class="text-4xl mb-3">🛡️</div>
+            <h3 class="font-bold text-gray-900 mb-2">Warranty</h3>
+            <p class="text-gray-600">Full manufacturer warranty included</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="error" class="hidden text-center py-16">
+      <div class="text-6xl mb-4">😕</div>
+      <h2 class="text-2xl font-bold text-gray-900 mb-2">Product Not Found</h2>
+      <p class="text-gray-600 mb-6">Sorry, we couldn't find the product you're looking for.</p>
+      <a href="#" class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition-colors">
+        Back to Products
+      </a>
+    </div>
+  </main>
+
+  <script>
+    // Mock API URL - replace with your actual API
+    const API_URL = "https://fakestoreapi.com/products";
+
+    // Cart functionality
+    let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+
+    function updateCartCount() {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const cartCount = document.getElementById('cart-count');
+      cartCount.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+    }
+
+    function addToCart(id, title, price, image) {
+      const quantity = parseInt(document.getElementById('quantity').value);
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const existingItem = cart.find(item => item.id === id);
+
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        cart.push({ id, title, price, image, quantity });
+      }
+
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCartCount();
+
+      // Show success feedback
+      const button = document.getElementById('add-to-cart');
+      const originalText = button.textContent;
+      button.textContent = '✓ Added to Cart!';
+      button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+
+      setTimeout(() => {
+        button.textContent = originalText;
+      }, 3000);
+    }
+
+    function changeQuantity(change) {
+      const quantityInput = document.getElementById('quantity');
+      const currentValue = parseInt(quantityInput.value);
+      const newValue = Math.max(1, Math.min(10, currentValue + change));
+      quantityInput.value = newValue;
+    }
+
+    function generateStars(rating) {
+      const fullStars = Math.floor(rating);
+      const hasHalfStar = rating % 1 >= 0.5;
+      let stars = '';
+
+      for (let i = 0; i < 5; i++) {
+        if (i < fullStars) {
+          stars += '★';
+        } else if (i === fullStars && hasHalfStar) {
+          stars += '☆';
+        } else {
+          stars += '☆';
+        }
+      }
+      return stars;
+    }
+
+    // Load product details
+    if (document.getElementById("product-details")) {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get("id") || "1"; // Default to product 1 for demo
+
+      fetch(`${API_URL}/${id}`)
+        .then(res => {
+          if (!res.ok) throw new Error('Product not found');
+          return res.json();
+        })
+        .then(product => {
+          // Hide loading, show content
+          document.getElementById('loading').classList.add('hidden');
+          document.getElementById('product-details').classList.remove('hidden');
+
+          // Update page title and breadcrumb
+          document.title = `${product.title} - MyShop`;
+          document.getElementById('breadcrumb-product').textContent = product.title;
+
+          // Populate product details
+          document.getElementById('main-image').src = product.image;
+          document.getElementById('main-image').alt = product.title;
+          document.getElementById('category').textContent = product.category.toUpperCase();
+          document.getElementById('product-title').textContent = product.title;
+          document.getElementById('product-price').textContent = `$${product.price.toFixed(2)}`;
+          document.getElementById('product-description').textContent = product.description;
+
+          // Rating
+          if (product.rating) {
+            document.getElementById('rating-stars').textContent = generateStars(product.rating.rate);
+            document.getElementById('rating-text').textContent = `${product.rating.rate}/5`;
+            document.getElementById('rating-count').textContent = `(${product.rating.count} reviews)`;
+          }
+
+          // Add to cart functionality
+          document.getElementById('add-to-cart').onclick = () => {
+            addToCart(product.id, product.title, product.price, product.image);
+          };
+        })
+        .catch(error => {
+          console.error('Error loading product:', error);
+          document.getElementById('loading').classList.add('hidden');
+          document.getElementById('error').classList.remove('hidden');
+        });
+    }
+
+    // Initialize cart count
+    updateCartCount();
+  </script>
+</body>
+
+</html>
