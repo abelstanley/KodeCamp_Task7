@@ -261,6 +261,125 @@ function updateCartTotals(subtotal) {
 }
 
 // ========================================
+// PRODUCT DETAILS PAGE FUNCTIONS (from JS2)
+// ========================================
+
+// Change quantity for product details page
+function changeQuantity(change) {
+  const quantityInput = document.getElementById('quantity');
+  const currentValue = parseInt(quantityInput.value);
+  const newValue = Math.max(1, Math.min(10, currentValue + change));
+  quantityInput.value = newValue;
+}
+
+// Generate stars for rating display
+function generateStars(rating) {
+  const fullStars = Math.floor(rating);
+  const hasHalfStar = rating % 1 >= 0.5;
+  let stars = '';
+
+  for (let i = 0; i < 5; i++) {
+    if (i < fullStars) {
+      stars += '★';
+    } else if (i === fullStars && hasHalfStar) {
+      stars += '☆';
+    } else {
+      stars += '☆';
+    }
+  }
+  return stars;
+}
+
+// Load product details for product page
+function loadProductDetails() {
+  // Only run on product details page
+  if (!document.getElementById("product-details")) return;
+  
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id") || "1"; // Default to product 1 for demo
+
+  fetch(`${API_URL}/${id}`)
+    .then(res => {
+      if (!res.ok) throw new Error('Product not found');
+      return res.json();
+    })
+    .then(product => {
+      // Hide loading, show content
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('product-details').classList.remove('hidden');
+
+      // Update page title and breadcrumb
+      document.title = `${product.title} - StanP Collections`;
+      const breadcrumbProduct = document.getElementById('breadcrumb-product');
+      if (breadcrumbProduct) breadcrumbProduct.textContent = product.title;
+
+      // Populate product details
+      document.getElementById('main-image').src = product.image;
+      document.getElementById('main-image').alt = product.title;
+      
+      const categoryElement = document.getElementById('category');
+      if (categoryElement) categoryElement.textContent = product.category.toUpperCase();
+      
+      document.getElementById('product-title').textContent = product.title;
+      document.getElementById('product-price').textContent = `$${product.price.toFixed(2)}`;
+      document.getElementById('product-description').textContent = product.description;
+
+      // Rating
+      if (product.rating) {
+        document.getElementById('rating-stars').textContent = generateStars(product.rating.rate);
+        document.getElementById('rating-text').textContent = `${product.rating.rate}/5`;
+        document.getElementById('rating-count').textContent = `(${product.rating.count} reviews)`;
+      }
+
+      // Add to cart functionality
+      const addToCartBtn = document.getElementById('add-to-cart');
+      if (addToCartBtn) {
+        addToCartBtn.onclick = () => {
+          const quantity = parseInt(document.getElementById('quantity').value);
+          addToCartWithQuantity(product.id, product.title, product.price, product.image, quantity);
+        };
+      }
+    })
+    .catch(error => {
+      console.error('Error loading product:', error);
+      document.getElementById('loading').classList.add('hidden');
+      const errorElement = document.getElementById('error');
+      if (errorElement) errorElement.classList.remove('hidden');
+    });
+}
+
+// Add to cart with specific quantity (for product details page)
+function addToCartWithQuantity(id, title, price, image, quantity) {
+  const existingItem = cartData.find(item => item.id === id);
+
+  if (existingItem) {
+    existingItem.quantity += quantity;
+  } else {
+    cartData.push({ id, title, price, image, quantity });
+  }
+
+  localStorage.setItem('cart', JSON.stringify(cartData));
+  updateCartCount();
+
+  // Show success feedback
+  const button = document.getElementById('add-to-cart');
+  if (button) {
+    const originalText = button.textContent;
+    button.textContent = '✓ Added to Cart!';
+    button.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+
+    setTimeout(() => {
+      button.textContent = originalText;
+      button.style.background = '';
+    }, 3000);
+  }
+  
+  // Show toast notification
+  const shortTitle = title.length > 30 ? title.substring(0, 30) + '...' : title;
+  showToast(`Added ${quantity} "${shortTitle}" to cart!`);
+}
+
+// ========================================
 // CHECKOUT PAGE FUNCTIONS
 // ========================================
 
@@ -335,7 +454,7 @@ function displayFeaturedProduct(product) {
           View Details
         </a>
         <button 
-          class="bg-gray-100 text-gray-800 py-3 px-6 rounded-full hover:bg-gray-200 transition duration-300 font-medium add-to-cart-btn"
+          class="bg-purple-200 text-gray-800 py-3 px-6 rounded-full hover:bg-gray-300 transition duration-300 font-medium add-to-cart-btn"
           data-id="${product.id}" data-title="${product.title}" data-price="${product.price}" data-image="${product.image}">
           Add to Cart
         </button>
@@ -363,43 +482,45 @@ function displayProducts(products = null) {
   if (noResults) noResults.classList.add('hidden');
   
   container.innerHTML = productsToShow.map((product, index) => `
-    <div class="product-card bg-white rounded-2xl shadow-lg overflow-hidden animate-fade-in" style="animation-delay: ${index * 0.1}s">
-      <div class="relative group">
-        <img src="${product.image}" alt="${product.title}" class="w-full h-48 md:h-64 object-contain p-4 group-hover:scale-105 transition duration-300">
-        <div class="absolute top-4 right-4">
-          <button class="wishlist-btn bg-white shadow-lg rounded-full p-2 opacity-0 group-hover:opacity-100 transition duration-300 hover:bg-gray-100">
-            <svg class="w-5 h-5 text-gray-600 hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-            </svg>
-          </button>
+    <div class="product-card bg-white rounded-2xl shadow-lg overflow-hidden animate-fade-in flex flex-col justify-between h-full" style="animation-delay: ${index * 0.1}s">
+      <div>
+        <div class="relative group">
+          <img src="${product.image}" alt="${product.title}" class="w-full h-48 md:h-64 object-contain p-4 group-hover:scale-105 transition duration-300">
+          <div class="absolute top-4 right-4">
+            <button class="wishlist-btn bg-white shadow-lg rounded-full p-2 opacity-0 group-hover:opacity-100 transition duration-300 hover:bg-gray-100">
+              <svg class="w-5 h-5 text-gray-600 hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+              </svg>
+            </button>
+          </div>
+          ${product.rating?.rate >= 4 ? '<div class="absolute top-4 left-4 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold">Top Rated</div>' : ''}
         </div>
-        ${product.rating?.rate >= 4 ? '<div class="absolute top-4 left-4 bg-green-500 text-white px-2 py-1 rounded-full text-xs font-bold">Top Rated</div>' : ''}
-      </div>
-      <div class="p-6">
-        <h3 class="font-bold text-lg mb-2 text-gray-900 line-clamp-2 hover:text-purple-600 transition duration-200">
-          <a href="${getProductUrl(product.id)}">${product.title}</a>
-        </h3>
-        <div class="flex items-center justify-between mb-4">
-          <span class="text-2xl font-bold text-purple-600 price-badge">$${product.price}</span>
-          <div class="flex items-center space-x-1">
-            <div class="rating-stars text-yellow-400">
-              ${generateStars(product.rating?.rate || 0)}
+        <div class="p-6 pb-2 flex flex-col">
+          <h3 class="font-bold text-lg mb-2 text-gray-900 line-clamp-2 hover:text-purple-600 transition duration-200">
+            <a href="${getProductUrl(product.id)}">${product.title}</a>
+          </h3>
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-2xl font-bold text-purple-600 price-badge">$${product.price}</span>
+            <div class="flex items-center space-x-1">
+              <div class="rating-stars text-yellow-400">
+                ${generateStars(product.rating?.rate || 0)}
+              </div>
+              <span class="text-sm text-gray-600">(${product.rating?.count || 0})</span>
             </div>
-            <span class="text-sm text-gray-600">(${product.rating?.count || 0})</span>
           </div>
         </div>
-        <div class="flex space-x-2">
-          <a href="${getProductUrl(product.id)}" 
-             class="flex-1 bg-purple-600 text-white text-center py-2 px-4 rounded-full hover:bg-purple-700 transition duration-300 font-medium text-sm">
-            View Details
-          </a>
-          <button 
-            class="bg-gray-100 text-gray-800 py-2 px-4 rounded-full hover:bg-gray-200 transition duration-300 font-medium text-sm add-to-cart-btn"
-            data-id="${product.id}" data-title="${product.title}" data-price="${product.price}" data-image="${product.image}"
-            onclick="addToCart(${product.id}, '${product.title.replace(/'/g, "\\'")}', ${product.price}, '${product.image}')">
-            <i class="fas fa-shopping-cart"></i>
-          </button>
-        </div>
+      </div>
+      <div class="px-6 pb-4 mt-auto flex space-x-2">
+        <a href="${getProductUrl(product.id)}" 
+           class="flex-1 bg-purple-600 text-white text-center py-2 px-4 rounded-full hover:bg-purple-700 transition duration-300 font-medium text-sm">
+          View Details
+        </a>
+        <button 
+          class="bg-gray-300 text-white py-2 px-4 rounded-full hover:bg-gray-800 transition duration-300 font-semibold text-sm add-to-cart-btn"
+          data-id="${product.id}" data-title="${product.title}" data-price="${product.price}" data-image="${product.image}"
+          onclick="addToCart(${product.id}, '${product.title.replace(/'/g, "\\'")}', ${product.price}, '${product.image}')">
+          <i class="fas fa-shopping-cart"></i>
+        </button>
       </div>
     </div>
   `).join('');
@@ -413,28 +534,6 @@ function getProductUrl(productId) {
   } else {
     return `./pages/product.html?id=${productId}`;
   }
-}
-
-// Generate star rating HTML
-function generateStars(rating) {
-  const fullStars = Math.floor(rating);
-  const hasHalfStar = rating % 1 !== 0;
-  let stars = '';
-  
-  for (let i = 0; i < fullStars; i++) {
-    stars += '<i class="fas fa-star"></i>';
-  }
-  
-  if (hasHalfStar) {
-    stars += '<i class="fas fa-star-half-alt"></i>';
-  }
-  
-  const emptyStars = 5 - Math.ceil(rating);
-  for (let i = 0; i < emptyStars; i++) {
-    stars += '<i class="far fa-star"></i>';
-  }
-  
-  return stars;
 }
 
 // Display categories (home page)
@@ -900,6 +999,11 @@ function initializePage() {
     loadCategoryProducts();
   }
   
+  // Handle product details page
+  if (document.getElementById('product-details')) {
+    loadProductDetails();
+  }
+  
   // Handle cart page
   if (document.getElementById('cart-items')) {
     renderCart();
@@ -1001,15 +1105,6 @@ function setupEventListeners() {
       }
     });
   });
-}
-
-// ========================================
-// UTILITY FUNCTIONS
-// ========================================
-
-// Show confirmation when adding to cart (alternative method)
-function showAddToCartConfirmation(productTitle) {
-  showToast(`Added "${productTitle}" to cart!`);
 }
 
 // ========================================
